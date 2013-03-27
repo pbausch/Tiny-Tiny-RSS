@@ -182,8 +182,6 @@
 		<input type="button" class="toolbarbutton" name="update" onclick="viewCurrentFeed()" value="Update Feed">
 		<input type="button" class="toolbarbutton" name="read" onclick="catchupCurrentFeed()" value="Mark All Read">
 		
-		<input type="button" class="toolbarbutton" name="prev" onclick="moveToPost('prev', true);" value="&#x25B2;">
-		<input type="button" class="toolbarbutton" name="next" onclick="moveToPost('next', true);" value="&#x25BC;">
 		</form>
 
 		<div class="actionChooser">
@@ -200,6 +198,8 @@
 				title="<?php echo __('New version of Tiny Tiny RSS is available!') ?>" />
 			</button>
 
+			<input type="button" class="toolbarbutton" name="prev" onclick="moveToPost('prev', true);" value="&#x25B2;">
+			<input type="button" class="toolbarbutton" name="next" onclick="moveToPost('next', true);" value="&#x25BC;">
 
 			<div dojoType="dijit.form.DropDownButton">
 				<span><?php echo __('<img src="/images/gear3.png">') ?></span>

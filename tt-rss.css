@@ -406,6 +406,7 @@ a.helpLink:hover {
 	border-color : #c0c0c0;
 	border-style : solid;
 	background : #fafafa;
+	line-height:130%;
 }
 
 #content-insert code, #headlines-frame code, .dijitContentPane code {
@@ -1488,6 +1489,10 @@ strong, b {
 
 #toolbar .dijitDropDownButton {
 	margin-top:-11px;
+	outline:none !important;
+}
+
+#toolbar .dijitButtonNode {
 	outline:none !important;
 }
 

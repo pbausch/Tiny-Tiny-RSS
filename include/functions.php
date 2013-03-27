@@ -871,7 +871,7 @@
 		if (!$owner_uid) $owner_uid = $_SESSION['uid'];
 
 		if (date("Y.m.d", $timestamp) == date("Y.m.d", time() + $tz_offset)) {
-			return date("G:i", $timestamp) . " (" . ago($timestamp,$tz_offset) . ")";;
+			return date("g:i A", $timestamp) . " (" . ago($timestamp,$tz_offset) . ")";;
 		} else if (date("Y", $timestamp) == date("Y", time() + $tz_offset)) {
 			$format = get_pref($link, 'SHORT_DATE_FORMAT', $owner_uid);
 			return date($format, $timestamp) . " (" . ago($timestamp,$tz_offset) . ")";;
