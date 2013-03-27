@@ -19,8 +19,8 @@ class Swap_JK extends Plugin {
 
 	function hook_hotkey_map($hotkeys) {
 
-		$hotkeys["j"] = "next_feed";
-		$hotkeys["k"] = "prev_feed";
+		$hotkeys["j"] = "next_article_noscroll";
+		$hotkeys["k"] = "prev_article_noscroll";
 
 		return $hotkeys;
 
