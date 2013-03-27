@@ -156,11 +156,13 @@
 
 		<form id="main_toolbar_form" action="" onsubmit='return false'>
 
+		<!--
 		<button dojoType="dijit.form.Button" id="collapse_feeds_btn"
 			onclick="collapse_feedlist()"
 			title="<?php echo __('Collapse feedlist') ?>" style="display : inline">
 			&lt;&lt;</button>
-
+		-->
+		
 		<select name="view_mode" title="<?php echo __('Show articles') ?>"
 			onchange="viewModeChanged()"
 			dojoType="dijit.form.Select">
@@ -183,14 +185,9 @@
 		</select>
 
 		<!-- deprecated -->
-		<button dojoType="dijit.form.Button" name="update" style="display : none"
-			onclick="viewCurrentFeed()">
-			<?php echo __('Update') ?></button>
-
-		<button dojoType="dijit.form.Button"
-			onclick="catchupCurrentFeed()">
-			<?php echo __('Mark as read') ?></button>
-
+		<input type="button" class="toolbarbutton" name="update" onclick="viewCurrentFeed()" value="Update Feed">
+		<input type="button" class="toolbarbutton" name="read" onclick="catchupCurrentFeed()" value="Mark All Read">
+		
 		</form>
 
 		<div class="actionChooser">
@@ -209,7 +206,7 @@
 
 
 			<div dojoType="dijit.form.DropDownButton">
-				<span><?php echo __('Actions...') ?></span>
+				<span><?php echo __('<img src="/images/gear3.png">') ?></span>
 				<div dojoType="dijit.Menu" style="display: none">
 					<div dojoType="dijit.MenuItem" onclick="quickMenuGo('qmcPrefs')"><?php echo __('Preferences...') ?></div>
 					<div dojoType="dijit.MenuItem" onclick="quickMenuGo('qmcSearch')"><?php echo __('Search...') ?></div>
