@@ -81,43 +81,9 @@ class Feeds extends Handler_Protected {
 		$reply .= "
 			<a href=\"#\"
 				title=\"".__("View as RSS feed")."\"
-				onclick=\"displayDlg('generatedFeed', '$feed_id:$is_cat:$rss_link')\">
-				<img class=\"noborder\" style=\"vertical-align : middle\" src=\"images/pub_set.svg\"></a>";
+				onclick=\"displayDlg('generatedFeed', '$feed_id:$is_cat:$rss_link')\">";
 
 		$reply .= "</span>";
-
-		// left part
-
-		$reply .= __('Select:')."
-			<a href=\"#\" onclick=\"$sel_all_link\">".__('All')."</a>,
-			<a href=\"#\" onclick=\"$sel_unread_link\">".__('Unread')."</a>,
-			<a href=\"#\" onclick=\"$sel_inv_link\">".__('Invert')."</a>,
-			<a href=\"#\" onclick=\"$sel_none_link\">".__('None')."</a></li>";
-
-		$reply .= " ";
-
-		$reply .= "<select dojoType=\"dijit.form.Select\"
-			onchange=\"headlineActionsChange(this)\">";
-		$reply .= "<option value=\"false\">".__('More...')."</option>";
-
-		$reply .= "<option value=\"0\" disabled=\"1\">".__('Selection toggle:')."</option>";
-
-		$reply .= "<option value=\"$tog_unread_link\">".__('Unread')."</option>
-			<option value=\"$tog_marked_link\">".__('Starred')."</option>
-			<option value=\"$tog_published_link\">".__('Published')."</option>";
-
-		$reply .= "<option value=\"0\" disabled=\"1\">".__('Selection:')."</option>";
-
-		$reply .= "<option value=\"$catchup_sel_link\">".__('Mark as read')."</option>";
-		$reply .= "<option value=\"$set_score_link\">".__('Set score')."</option>";
-
-		if ($feed_id != "0") {
-			$reply .= "<option value=\"$archive_sel_link\">".__('Archive')."</option>";
-		} else {
-			$reply .= "<option value=\"$archive_sel_link\">".__('Move back')."</option>";
-			$reply .= "<option value=\"$delete_sel_link\">".__('Delete')."</option>";
-
-		}
 
 		global $pluginhost;
 
