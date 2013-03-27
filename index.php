@@ -141,7 +141,7 @@
 
 <div id="main" dojoType="dijit.layout.BorderContainer">
 
-<div id="feeds-holder" dojoType="dijit.layout.ContentPane" region="leading" style="width : 20%" splitter="true">
+<div id="feeds-holder" dojoType="dijit.layout.ContentPane" region="leading" style="width:246px;" splitter="true">
 	<div id="feedlistLoading">
 		<img src='images/indicator_tiny.gif'/>
 		<?php echo  __("Loading, please wait..."); ?></div>
