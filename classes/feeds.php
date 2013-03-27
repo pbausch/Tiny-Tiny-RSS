@@ -597,7 +597,8 @@ class Feeds extends Handler_Protected {
 
 //					if (!$expand_cdm) {
 						$reply['content'] .= "<span id=\"CENCW-$id\" style=\"display : none\">";
-						$reply['content'] .= htmlspecialchars($line["content"]);
+						//$reply['content'] .= htmlspecialchars($line["content"]);
+						$reply['content'] .= preg_replace('/<br><\/br>/is','<br>',$line["content"]);
 						$reply['content'] .= "</span.";
 
 //					} else {
