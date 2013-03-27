@@ -37,13 +37,17 @@
 .claro .dijitTreeRow, .claro .dijitTreeNode .dojoDndItemBefore, .claro .dijitTreeNode .dojoDndItemAfter {
   /* so insert line shows up on IE when dropping after a target element */
 
-  padding: 4px 0 2px 0;
+  padding: 4px 1px 2px 0;
+  margin: 0 1px;
+  /* replaced by border for selected/hovered row */
+
   background-color: none;
   background-color: transparent;
-  background-color: rgba(171, 214, 255, 0);
+  /* background-color: rgba(171, 214, 255, 0); */
   background-position: 0 0;
   background-repeat: repeat-x;
-  border: solid 0 transparent;
+  /* border-color: rgba(118, 157, 192, 0); */
+  border-width: 0;
   color: #000000;
   -webkit-transition-property: background-color, border-color;
   -moz-transition-property: background-color, border-color;
@@ -56,49 +60,59 @@
   transition-timing-function: ease-out;
 }
 .claro .dijitTreeRowSelected {
-  background-color: #cfe5fa;
-  background-image: url("images/standardGradient.png");
   background-repeat: repeat-x;
-  background-image: -moz-linear-gradient(rgba(255, 255, 255, 0.7) 0%, rgba(255, 255, 255, 0) 100%);
-  background-image: -webkit-linear-gradient(rgba(255, 255, 255, 0.7) 0%, rgba(255, 255, 255, 0) 100%);
-  background-image: -o-linear-gradient(rgba(255, 255, 255, 0.7) 0%, rgba(255, 255, 255, 0) 100%);
-  background-image: linear-gradient(rgba(255, 255, 255, 0.7) 0%, rgba(255, 255, 255, 0) 100%);
-  _background-image: none;
+  background-color: #5ab9ee;
+  /* background-image: url("images/commonHighlight.png"); */
+background: #5ab9ee; /* Old browsers */
+background: -moz-linear-gradient(top,  #5ab9ee 0%, #3097de 51%, #0f76c7 100%); /* FF3.6+ */
+background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#5ab9ee), color-stop(51%,#3097de), color-stop(100%,#0f76c7)); /* Chrome,Safari4+ */
+background: -webkit-linear-gradient(top,  #5ab9ee 0%,#3097de 51%,#0f76c7 100%); /* Chrome10+,Safari5.1+ */
+background: -o-linear-gradient(top,  #5ab9ee 0%,#3097de 51%,#0f76c7 100%); /* Opera 11.10+ */
+background: -ms-linear-gradient(top,  #5ab9ee 0%,#3097de 51%,#0f76c7 100%); /* IE10+ */
+background: linear-gradient(to bottom,  #5ab9ee 0%,#3097de 51%,#0f76c7 100%); /* W3C */
+filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#5ab9ee', endColorstr='#0f76c7',GradientType=0 ); /* IE6-9 */
   padding: 3px 0 1px;
-  border-color: #759dc0;
-  border-width: 1px 0;
-  color: #000000;
+  margin: 0;
+  border: solid 1px #197CC9;
+  color: #FFF;
+  text-shadow: 0 1px rgba(100,100,100,.8);
+  outline:none !important;
 }
+/*
 .claro .dijitTreeRowHover {
-  background-color: #abd6ff;
-  background-image: url("images/standardGradient.png");
-  background-repeat: repeat-x;
-  background-image: -moz-linear-gradient(rgba(255, 255, 255, 0.7) 0%, rgba(255, 255, 255, 0) 100%);
-  background-image: -webkit-linear-gradient(rgba(255, 255, 255, 0.7) 0%, rgba(255, 255, 255, 0) 100%);
-  background-image: -o-linear-gradient(rgba(255, 255, 255, 0.7) 0%, rgba(255, 255, 255, 0) 100%);
-  background-image: linear-gradient(rgba(255, 255, 255, 0.7) 0%, rgba(255, 255, 255, 0) 100%);
-  _background-image: none;
+  background-color: #0E86D9;
+  background-image: url("images/commonHighlight.png");
   padding: 3px 0 1px;
-  border-color: #759dc0;
-  border-width: 1px 0;
-  color: #000000;
+  margin: 0;
+  border: solid 1px #197CC9;
+  color: #FFF;
   -webkit-transition-duration: 0.25s;
   -moz-transition-duration: 0.25s;
   transition-duration: 0.25s;
 }
+*/
 .claro .dijitTreeRowActive {
-  background-color: #7dbdfa;
-  background-image: url("images/activeGradient.png");
-  background-repeat: repeat-x;
-  background-image: -moz-linear-gradient(rgba(190, 190, 190, 0.98) 0px, rgba(255, 255, 255, 0.65) 3px, rgba(255, 255, 255, 0) 100%);
-  background-image: -webkit-linear-gradient(rgba(190, 190, 190, 0.98) 0px, rgba(255, 255, 255, 0.65) 3px, rgba(255, 255, 255, 0) 100%);
-  background-image: -o-linear-gradient(rgba(190, 190, 190, 0.98) 0px, rgba(255, 255, 255, 0.65) 3px, rgba(255, 255, 255, 0) 100%);
-  background-image: linear-gradient(rgba(190, 190, 190, 0.98) 0px, rgba(255, 255, 255, 0.65) 3px, rgba(255, 255, 255, 0) 100%);
-  _background-image: none;
+  background-color: #5ab9ee;
+  /* background-image: url("images/commonHighlight.png"); */
+background: #5ab9ee; /* Old browsers */
+background: -moz-linear-gradient(top,  #5ab9ee 0%, #3097de 51%, #0f76c7 100%); /* FF3.6+ */
+background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#5ab9ee), color-stop(51%,#3097de), color-stop(100%,#0f76c7)); /* Chrome,Safari4+ */
+background: -webkit-linear-gradient(top,  #5ab9ee 0%,#3097de 51%,#0f76c7 100%); /* Chrome10+,Safari5.1+ */
+background: -o-linear-gradient(top,  #5ab9ee 0%,#3097de 51%,#0f76c7 100%); /* Opera 11.10+ */
+background: -ms-linear-gradient(top,  #5ab9ee 0%,#3097de 51%,#0f76c7 100%); /* IE10+ */
+background: linear-gradient(to bottom,  #5ab9ee 0%,#3097de 51%,#0f76c7 100%); /* W3C */
+filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#5ab9ee', endColorstr='#0f76c7',GradientType=0 ); /* IE6-9 */
+
+  background-position: 0 -177px;
   padding: 3px 0 1px;
-  border-color: #759dc0;
-  border-width: 1px 0;
-  color: #000000;
+  margin-left: 0;
+  border: solid 1px #197CC9;
+  color: #FFF;
+  text-shadow: 0 1px rgba(100,100,100,.8);
+  outline:none !important;
+}
+.dj_ie6 .claro .dijitTreeRow {
+  background-image: none;
 }
 .claro .dijitTreeRowFocused {
   background-repeat: repeat;
@@ -136,8 +150,8 @@
  * though dijitTreeRowNode is the actual "drag object"
  */
 .claro .dijitTreeNode .dojoDndItemBefore .dijitTreeContent {
-  border-top: 2px solid #759dc0;
+  border-top: 2px solid #197CC9;
 }
 .claro .dijitTreeNode .dojoDndItemAfter .dijitTreeContent {
-  border-bottom: 2px solid #759dc0;
+  border-bottom: 2px solid #197CC9;
 }
