@@ -78,37 +78,6 @@ class Feeds extends Handler_Protected {
 
 		$reply .= "</span>";
 
-		$reply .= "
-			<a href=\"#\"
-				title=\"".__("View as RSS feed")."\"
-				onclick=\"displayDlg('generatedFeed', '$feed_id:$is_cat:$rss_link')\">";
-
-		$reply .= "</span>";
-
-		global $pluginhost;
-
-		if ($pluginhost->get_plugin("mail")) {
-			$reply .= "<option value=\"emailArticle(false)\">".__('Forward by email').
-				"</option>";
-		}
-
-		if ($pluginhost->get_plugin("mailto")) {
-			$reply .= "<option value=\"mailtoArticle(false)\">".__('Forward by email').
-				"</option>";
-		}
-
-		$reply .= "<option value=\"0\" disabled=\"1\">".__('Feed:')."</option>";
-
-		$reply .= "<option value=\"catchupPage()\">".__('Mark as read')."</option>";
-
-		$reply .= "<option value=\"displayDlg('generatedFeed', '$feed_id:$is_cat:$rss_link')\">".__('View as RSS')."</option>";
-
-		$reply .= "</select>";
-
-		//$reply .= "</div>";
-
-		//$reply .= "</h2";
-
 		return $reply;
 	}
 
