@@ -155,13 +155,6 @@
 	<div id="main-toolbar" dojoType="dijit.Toolbar">
 
 		<form id="main_toolbar_form" action="" onsubmit='return false'>
-
-		<!--
-		<button dojoType="dijit.form.Button" id="collapse_feeds_btn"
-			onclick="collapse_feedlist()"
-			title="<?php echo __('Collapse feedlist') ?>" style="display : inline">
-			&lt;&lt;</button>
-		-->
 		
 		<select name="view_mode" title="<?php echo __('Show articles') ?>"
 			onchange="viewModeChanged()"
@@ -185,9 +178,12 @@
 		</select>
 
 		<!-- deprecated -->
+		<input type="button" class="toolbarbutton" name="collapse_feeds_btn" id="collapse_feeds_btn" onclick="collapse_feedlist()" value="&lt;&lt;">
 		<input type="button" class="toolbarbutton" name="update" onclick="viewCurrentFeed()" value="Update Feed">
 		<input type="button" class="toolbarbutton" name="read" onclick="catchupCurrentFeed()" value="Mark All Read">
 		
+		<input type="button" class="toolbarbutton" name="prev" onclick="moveToPost('prev', true);" value="&#x25B2;">
+		<input type="button" class="toolbarbutton" name="next" onclick="moveToPost('next', true);" value="&#x25BC;">
 		</form>
 
 		<div class="actionChooser">

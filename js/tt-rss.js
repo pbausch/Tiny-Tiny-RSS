@@ -709,11 +709,11 @@ function collapse_feedlist() {
 		if (!Element.visible('feeds-holder')) {
 			Element.show('feeds-holder');
 			Element.show('feeds-holder_splitter');
-			$("collapse_feeds_btn").innerHTML = "&lt;&lt;";
+			document.getElementById("collapse_feeds_btn").value = "<<";
 		} else {
 			Element.hide('feeds-holder');
 			Element.hide('feeds-holder_splitter');
-			$("collapse_feeds_btn").innerHTML = "&gt;&gt;";
+			document.getElementById("collapse_feeds_btn").value = ">>";
 		}
 
 		dijit.byId("main").resize();
