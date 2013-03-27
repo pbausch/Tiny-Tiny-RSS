@@ -345,9 +345,9 @@ class Feeds extends Handler_Protected {
 
 				$entry_author = $line["author"];
 
-				if ($entry_author) {
-					$entry_author = " - $entry_author";
-				}
+				//if ($entry_author) {
+				//	$entry_author = " - $entry_author";
+				//}
 
 				$has_feed_icon = feed_has_icon($feed_id);
 
@@ -416,21 +416,21 @@ class Feeds extends Handler_Protected {
 
 					$reply['content'] .= "<span class=\"hlUpdated\">";
 
-					if (!get_pref($this->link, 'VFEED_GROUP_BY_FEED')) {
-						if (@$line["feed_title"]) {
-							$reply['content'] .= "<div class=\"hlFeed\">
-								<a href=\"#\" onclick=\"viewfeed($feed_id)\">".
-								truncate_string($line["feed_title"],30)."</a>
-							</div>";
-						}
-					}
+					//if (!get_pref($this->link, 'VFEED_GROUP_BY_FEED')) {
+					//	if (@$line["feed_title"]) {
+					//		$reply['content'] .= "<div class=\"hlFeed\">
+					//			<a href=\"#\" onclick=\"viewfeed($feed_id)\">".
+					//			truncate_string($line["feed_title"],30)."</a>
+					//		</div>";
+					//	}
+					//}
 
 					$reply['content'] .= "<span title='$date_entered_fmt'>$updated_fmt</span>
 						</span>";
 
 					$reply['content'] .= "<div class=\"hlRight\">";
 
-					$reply['content'] .= $score_pic;
+					//$reply['content'] .= $score_pic;
 
 					if ($line["feed_title"] && !get_pref($this->link, 'VFEED_GROUP_BY_FEED')) {
 
@@ -488,18 +488,31 @@ class Feeds extends Handler_Protected {
 					$reply['content'] .= "<div class=\"cdm $expanded_class $class\"
 						id=\"RROW-$id\" $mouseover_attrs'>";
 
+					$reply['content'] .= "<div class='meta'>";
+					$reply['content'] .= "<span class='updated' title='$date_entered_fmt'>$updated_fmt</span>";
+
+					//$reply['content'] .= "<div style=\"vertical-align : middle\">";
+					//$reply['content'] .= "$score_pic";
+
+					if (!get_pref($this->link, "VFEED_GROUP_BY_FEED") && $line["feed_title"]) {
+						$reply['content'] .= " <span style=\"cursor : pointer\"
+							title=\"".htmlspecialchars($line["feed_title"])."\"
+							onclick=\"viewfeed($feed_id)\">$feed_icon_img</span>";
+					}
+					$reply['content'] .= "</div>";
+
 					$reply['content'] .= "<div class=\"cdmHeader\">";
 
-					$reply['content'] .= "<div style=\"vertical-align : middle\">";
+					//$reply['content'] .= "<div style=\"vertical-align : middle\">";
 
-					$reply['content'] .= "<input dojoType=\"dijit.form.CheckBox\"
-							type=\"checkbox\" onclick=\"toggleSelectRow2(this, false, true)\"
-							id=\"RCHK-$id\">";
+					//$reply['content'] .= "<input dojoType=\"dijit.form.CheckBox\"
+					//		type=\"checkbox\" onclick=\"toggleSelectRow2(this, false, true)\"
+					//		id=\"RCHK-$id\">";
 
-					$reply['content'] .= "$marked_pic";
-					$reply['content'] .= "$published_pic";
+					//$reply['content'] .= "$marked_pic";
+					//$reply['content'] .= "$published_pic";
 
-					$reply['content'] .= "</div>";
+					//$reply['content'] .= "</div>";
 
 					$reply['content'] .= "<span id=\"RTITLE-$id\"
 						onclick=\"return cdmClicked(event, $id);\"
@@ -508,7 +521,11 @@ class Feeds extends Handler_Protected {
 						target=\"_blank\" href=\"".
 						htmlspecialchars($line["link"])."\">".
 						$line["title"] .
-						" <span class=\"author\">$entry_author</span></a>";
+						"</a>";
+
+					if ($entry_author) {
+						$reply['content'] .= "<div class='author'>by " . $entry_author . "</div>";
+					}
 
 					$reply['content'] .= $labels_str;
 
@@ -525,27 +542,14 @@ class Feeds extends Handler_Protected {
 						id=\"CEXC-$id\" class=\"cdmExcerpt\"> - $content_preview</span>";
 					$reply['content'] .= "</span>";
 
-					if (!get_pref($this->link, 'VFEED_GROUP_BY_FEED')) {
-						if (@$line["feed_title"]) {
-							$reply['content'] .= "<div class=\"hlFeed\">
-								<a href=\"#\" onclick=\"viewfeed($feed_id)\">".
-								truncate_string($line["feed_title"],30)."</a>
-							</div>";
-						}
-					}
-
-					$reply['content'] .= "<span class='updated' title='$date_entered_fmt'>
-						$updated_fmt</span>";
-
-					$reply['content'] .= "<div style=\"vertical-align : middle\">";
-					$reply['content'] .= "$score_pic";
-
-					if (!get_pref($this->link, "VFEED_GROUP_BY_FEED") && $line["feed_title"]) {
-						$reply['content'] .= "<span style=\"cursor : pointer\"
-							title=\"".htmlspecialchars($line["feed_title"])."\"
-							onclick=\"viewfeed($feed_id)\">$feed_icon_img</span>";
-					}
-					$reply['content'] .= "</div>";
+					//if (!get_pref($this->link, 'VFEED_GROUP_BY_FEED')) {
+					//	if (@$line["feed_title"]) {
+					//		$reply['content'] .= "<div class=\"hlFeed\">
+					//			<a href=\"#\" onclick=\"viewfeed($feed_id)\">".
+					//			truncate_string($line["feed_title"],30)."</a>
+					//		</div>";
+					//	}
+					//}
 
 					$reply['content'] .= "</div>";
 
@@ -609,6 +613,13 @@ class Feeds extends Handler_Protected {
 					$reply['content'] .= "</div>";
 
 					$reply['content'] .= "<div class=\"cdmFooter\">";
+
+					$reply['content'] .= "<input dojoType=\"dijit.form.CheckBox\"
+							type=\"checkbox\" onclick=\"toggleSelectRow2(this, false, true)\"
+							id=\"RCHK-$id\">";
+
+					$reply['content'] .= "$marked_pic";
+					$reply['content'] .= "$published_pic";
 
 					$tags_str = format_tags_string($line["tags"], $id);
 

@@ -356,7 +356,7 @@ class RPC extends Handler_Protected {
 		$tags_str = format_tags_string($tags, $id);
 		$tags_str_full = join(", ", $tags);
 
-		if (!$tags_str_full) $tags_str_full = __("no tags");
+		if (!$tags_str_full) $tags_str_full = __(""); //no tags
 
 		print json_encode(array("tags_str" => array("id" => $id,
 				"content" => $tags_str, "content_full" => $tags_str_full)));

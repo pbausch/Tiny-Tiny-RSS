@@ -44,7 +44,7 @@ div.postReply div.postHeader {
 .cdmHeader a {
 	font-family:"open sans","lucida grande","sans-serif";
 	color: #08c !important;
-	font-size:115%;
+	font-size:115% !important;
 	font-weight:bold;
 	background:#fff;
 }
@@ -1335,7 +1335,8 @@ ul.helpKbList h2 {
 .cdmContentInner {
 	width:650px;
 	overflow:visible;
-	line-height:130%;	
+	line-height:130%;
+	font-weight:normal;	
 }
 .cdmContentInner td {
 	border-color:#fff!important;
@@ -1349,6 +1350,7 @@ ul.helpKbList h2 {
 	display:inline-block!important;
 }
 .cdmFooter {
+	background-image:none!important;
 	background-color:#fff!important;
 	font-size:80%;
 }

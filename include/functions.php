@@ -863,7 +863,7 @@
 			else
 				$format = get_pref($link, 'SHORT_DATE_FORMAT', $owner_uid);
 
-			return date($format, $user_timestamp);
+			return date($format, $user_timestamp) . " (" . ago($user_timestamp) . ")";;
 		}
 	}
 
@@ -871,13 +871,13 @@
 		if (!$owner_uid) $owner_uid = $_SESSION['uid'];
 
 		if (date("Y.m.d", $timestamp) == date("Y.m.d", time() + $tz_offset)) {
-			return date("G:i", $timestamp);
+			return date("G:i", $timestamp) . " (" . ago($timestamp,$tz_offset) . ")";;
 		} else if (date("Y", $timestamp) == date("Y", time() + $tz_offset)) {
 			$format = get_pref($link, 'SHORT_DATE_FORMAT', $owner_uid);
-			return date($format, $timestamp);
+			return date($format, $timestamp) . " (" . ago($timestamp,$tz_offset) . ")";;
 		} else {
 			$format = get_pref($link, 'LONG_DATE_FORMAT', $owner_uid);
-			return date($format, $timestamp);
+			return date($format, $timestamp) . " (" . ago($timestamp,$tz_offset) . ")";;
 		}
 	}
 
@@ -3080,7 +3080,7 @@
 			$tags_str = format_tags_string($line["tags"], $id);
 			$tags_str_full = join(", ", $line["tags"]);
 
-			if (!$tags_str_full) $tags_str_full = __("no tags");
+			if (!$tags_str_full) $tags_str_full = __(""); //no tags
 
 			if (!$entry_comments) $entry_comments = "&nbsp;"; # placeholder
 
@@ -3374,7 +3374,7 @@
 		}
 
 		if ($num_tags == 0) {
-			$tags_str = __("no tags");
+			$tags_str = __(""); //no tags
 		}
 
 		return $tags_str;
@@ -4184,4 +4184,30 @@
 		return LABEL_BASE_INDEX - 1 + abs($feed);
 	}
 
+
+	function ago($time,$tz_offset)
+	{
+	   $periods = array("second", "minute", "hour", "day", "week", "month", "year", "decade");
+	   $lengths = array("60","60","24","7","4.35","12","10");
+
+	   $now = time();
+
+	       $difference     = $now - ($time - $tz_offset);
+	       $tense         = "ago";
+
+	   for($j = 0; $difference >= $lengths[$j] && $j < count($lengths)-1; $j++) {
+	       $difference /= $lengths[$j];
+	   }
+
+	   $difference = round($difference);
+	   if ($difference < 0) {
+		  $difference = 0;
+	   }
+
+	   if($difference != 1) {
+	       $periods[$j].= "s";
+	   }
+
+	   return "$difference $periods[$j] ago";
+	}
 ?>
