@@ -1153,6 +1153,7 @@ div.fatalError textarea {
 	font-size:13px;
 	height:16px;
 	font-weight:200 !important;	
+	outline: none !important;
 }
 
 .dijitTreeLabel.Unread {
