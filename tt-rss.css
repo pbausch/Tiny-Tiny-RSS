@@ -1420,6 +1420,7 @@ strong, b {
 	-o-box-shadow :inset 0 -1px 0 #cfcece,inset 0 1px 0 #f0f0f0 !important;
 	box-shadow :inset 0 -1px 0 #cfcece,inset 0 1px 0 #f0f0f0 !important;
 	height:25px !important;
+	padding-right:10px !important;
 }
 
 #headlines-toolbar {
@@ -1459,17 +1460,13 @@ strong, b {
 	-webkit-background-clip:padding-box !important;
 	background-clip :padding-box !important;
 	color:#3f3f3f !important;
-	height:18px !important;
 }
 
 .toolbarbutton {
-	height:20px !important;
 	font-family: arial,sans-serif !important;
+	font-size:11px !important;
 	color:#3f3f3f !important;
-	padding:6px !important;
-	padding-top:1px !important;
 	cursor:pointer !important;
-	line-height:18px !important;
 	font-weight:600 !important;
 	text-shadow:0 1px 0px rgba(255,255,255,.75) !important;
 }
@@ -1482,16 +1479,15 @@ strong, b {
 	background-image:linear-gradient(top,#d0d0d0,#f2f2f2) !important;
 }
 
-#toolbar .dijitButtonText, #toolbar .dijitButtonContents {
-	font-size:0px;
+#toolbar .dijitDropDownButton {
+  height:18px !important;
 }
 
 #toolbar .dijitButtonText img {
-	 margin-top:-2px;
+  margin-top:-2px;
 }
 
 #toolbar .dijitDropDownButton {
-	margin-top:-11px;
 	outline:none !important;
 }
 
@@ -1499,7 +1495,9 @@ strong, b {
 	outline:none !important;
 }
 
+
 #dijit_form_Select_0, #dijit_form_Select_1 {display:none;}
+
 
 #feed_title, #feed_title a {
 	color:#fff;

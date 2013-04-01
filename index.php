@@ -155,7 +155,11 @@
 	<div id="main-toolbar" dojoType="dijit.Toolbar">
 
 		<form id="main_toolbar_form" action="" onsubmit='return false'>
-		
+
+		<button dojoType="dijit.form.Button" id="collapse_feeds_btn"
+			onclick="collapse_feedlist()" class="toolbarbutton">
+			<?php echo __('Hide Feeds') ?></button>
+
 		<select name="view_mode" title="<?php echo __('Show articles') ?>"
 			onchange="viewModeChanged()"
 			dojoType="dijit.form.Select">
@@ -165,6 +169,7 @@
 			<option value="published"><?php echo __('Published') ?></option>
 			<option value="unread"><?php echo __('Unread') ?></option>
 			<option value="unread_first"><?php echo __('Unread First') ?></option>
+			<option value="has_note"><?php echo __('With Note') ?></option>
 			<!-- <option value="noscores"><?php echo __('Ignore Scoring') ?></option> -->
 		</select>
 
@@ -172,16 +177,19 @@
 			onchange="viewModeChanged()"
 			dojoType="dijit.form.Select" name="order_by">
 			<option selected="selected" value="default"><?php echo __('Default') ?></option>
-			<option value="date"><?php echo __('Date') ?></option>
-			<option value="title"><?php echo __('Title') ?></option>
-			<option value="score"><?php echo __('Score') ?></option>
+			<option value="feed_dates"><?php echo __('Newest first') ?></option>
+			<option value="date_reverse"><?php echo __('Oldest first') ?></option>
 		</select>
-
-		<!-- deprecated -->
-		<input type="button" class="toolbarbutton" name="collapse_feeds_btn" id="collapse_feeds_btn" onclick="collapse_feedlist()" value="&lt;&lt;">
-		<input type="button" class="toolbarbutton" name="update" onclick="viewCurrentFeed()" value="Update Feed">
-		<input type="button" class="toolbarbutton" name="read" onclick="catchupCurrentFeed()" value="Mark All Read">
 		
+		<!-- deprecated -->
+		<button dojoType="dijit.form.Button" name="update" 
+			onclick="viewCurrentFeed()" class="toolbarbutton">
+			<?php echo __('Update') ?></button>
+
+		<button dojoType="dijit.form.Button"
+			onclick="catchupCurrentFeed()" class="toolbarbutton">
+			<?php echo __('Mark as read') ?></button>
+
 		</form>
 
 		<div class="actionChooser">
@@ -198,11 +206,16 @@
 				title="<?php echo __('New version of Tiny Tiny RSS is available!') ?>" />
 			</button>
 
-			<input type="button" class="toolbarbutton" name="prev" onclick="moveToPost('prev', true);" value="&#x25B2;">
-			<input type="button" class="toolbarbutton" name="next" onclick="moveToPost('next', true);" value="&#x25BC;">
+			<button dojoType="dijit.form.Button"
+				onclick="moveToPost('prev', true);" class="toolbarbutton">
+				<?php echo __('&nbsp;&#x25B2;&nbsp;') ?></button>
 
-			<div dojoType="dijit.form.DropDownButton">
-				<span><?php echo __('<img src="images/gear3.png">') ?></span>
+			<button dojoType="dijit.form.Button"
+				onclick="moveToPost('next', true);" class="toolbarbutton">
+				<?php echo __('&nbsp;&#x25BC;&nbsp;') ?></button>
+
+			<div dojoType="dijit.form.DropDownButton" class="toolbarbutton">
+				<span><?php echo __('<img src="images/gear4.png">') ?></span>
 				<div dojoType="dijit.Menu" style="display: none">
 					<div dojoType="dijit.MenuItem" onclick="quickMenuGo('qmcPrefs')"><?php echo __('Preferences...') ?></div>
 					<div dojoType="dijit.MenuItem" onclick="quickMenuGo('qmcSearch')"><?php echo __('Search...') ?></div>
