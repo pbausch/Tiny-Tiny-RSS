@@ -1331,7 +1331,7 @@ ul.helpKbList h2 {
 	margin-top : 0px;
 }
 .cdmContent {
-	padding-top:14px;
+	padding-top:7px;
 	font-size:90%;
 	background:#fff;
 }
@@ -1342,12 +1342,15 @@ ul.helpKbList h2 {
 	font-weight:normal;	
 	margin-bottom:5px !important;
 }
+.cdmContentInner img {
+	padding: 3px 3px 3px 0px;
+}
 .cdmContentInner td {
 	border-color:#fff!important;
 	border-size:1px!important;
 }
 .cdmHeader {
-	margin: 0px 10px -14px 0px;
+	margin: 0px 10px -6px 0px;
 	max-width:650px;
 	background-color:#fff!important;
 	padding-left:5px;
