@@ -1397,7 +1397,7 @@ strong, b {
 	margin:10px 10px 0px 0px;
 }
 .claro .dijitSplitContainer-child, .claro .dijitBorderContainer-child {
-	background-image: url(/images/whitey.png);
+	background-image: url(images/whitey.png);
 }
 .claro .dijitSplitterV, .claro .dijitGutterV {
 	display:none;

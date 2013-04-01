@@ -202,7 +202,7 @@
 			<input type="button" class="toolbarbutton" name="next" onclick="moveToPost('next', true);" value="&#x25BC;">
 
 			<div dojoType="dijit.form.DropDownButton">
-				<span><?php echo __('<img src="/images/gear3.png">') ?></span>
+				<span><?php echo __('<img src="images/gear3.png">') ?></span>
 				<div dojoType="dijit.Menu" style="display: none">
 					<div dojoType="dijit.MenuItem" onclick="quickMenuGo('qmcPrefs')"><?php echo __('Preferences...') ?></div>
 					<div dojoType="dijit.MenuItem" onclick="quickMenuGo('qmcSearch')"><?php echo __('Search...') ?></div>
