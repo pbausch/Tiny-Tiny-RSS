@@ -24,6 +24,10 @@ class PluginHost {
 	const HOOK_FEED_FETCHED = 12;
 	const HOOK_SANITIZE = 13;
 	const HOOK_RENDER_ARTICLE_API = 14;
+	const HOOK_TOOLBAR_BUTTON = 15;
+	const HOOK_ACTION_ITEM = 16;
+	const HOOK_HEADLINE_TOOLBAR_BUTTON = 17;
+	const HOOK_HOTKEY_INFO = 18;
 
 	const KIND_ALL = 1;
 	const KIND_SYSTEM = 2;
@@ -172,10 +176,12 @@ class PluginHost {
 		return false;
 	}
 
-	function add_command($command, $description, $sender) {
+	function add_command($command, $description, $sender, $suffix = "", $arghelp = "") {
 		$command = str_replace("-", "_", strtolower($command));
 
 		$this->commands[$command] = array("description" => $description,
+			"suffix" => $suffix,
+			"arghelp" => $arghelp,
 			"class" => $sender);
 	}
 

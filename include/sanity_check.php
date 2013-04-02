@@ -2,6 +2,12 @@
 	// WARNING: Don't ask for help on tt-rss.org forums or the bugtracker if you have
 	// modified this file.
 
+	function make_self_url_path() {
+		$url_path = ($_SERVER['HTTPS'] != "on" ? 'http://' :  'https://') . $_SERVER["HTTP_HOST"] . parse_url($_SERVER["REQUEST_URI"], PHP_URL_PATH);
+
+		return $url_path;
+	}
+
 	function initial_sanity_check($link) {
 
 		$errors = array();
@@ -56,14 +62,6 @@
 				}
 			}
 
-			if (SESSION_EXPIRE_TIME < 60) {
-				array_push($errors, "SESSION_EXPIRE_TIME set in config.php is too low, please set it to an integer value >= 60");
-			}
-
-			if (SESSION_EXPIRE_TIME < SESSION_COOKIE_LIFETIME) {
-				array_push($errors, "SESSION_EXPIRE_TIME set in config.php should be >= to SESSION_COOKIE_LIFETIME");
-			}
-
 			if (SINGLE_USER_MODE) {
 				$link = db_connect(DB_HOST, DB_USER, DB_PASS, DB_NAME);
 
@@ -77,12 +75,10 @@
 			}
 
 			if (SELF_URL_PATH == "http://yourserver/tt-rss/") {
-				if ($_SERVER['HTTP_REFERER']) {
-					array_push($errors,
-						"Please set SELF_URL_PATH to the correct value for your server (possible value: <b>" . $_SERVER['HTTP_REFERER'] . "</b>)");
-				} else {
-					array_push($errors, "Please set SELF_URL_PATH to the correct value for your server.");
-				}
+				$urlpath = preg_replace("/\w+\.php$/", "", make_self_url_path());
+
+				array_push($errors,
+						"Please set SELF_URL_PATH to the correct value for your server (possible value: <b>$urlpath</b>)");
 			}
 
 			if (!is_writable(ICONS_DIR)) {

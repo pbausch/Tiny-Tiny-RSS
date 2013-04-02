@@ -36,6 +36,9 @@ function setActiveFeedId(id, is_cat) {
 		_active_feed_id = id;
 		_active_feed_is_cat = is_cat;
 
+		$("headlines-frame").setAttribute("feed-id", id);
+		$("headlines-frame").setAttribute("is-cat", is_cat ? 1 : 0);
+
 		selectFeed(id, is_cat);
 	} catch (e) {
 		exception_error("setActiveFeedId", e);
@@ -156,7 +159,7 @@ function timeout() {
 }
 
 function search() {
-	var query = "backend.php?op=dlg&method=search&param=" +
+	var query = "backend.php?op=feeds&method=search&param=" +
 		param_escape(getActiveFeedId() + ":" + activeFeedIsCat());
 
 	if (dijit.byId("searchDlg"))
@@ -425,7 +428,7 @@ function init() {
 				viewfeed(-2);
 		};
 		hotkey_actions["goto_tagcloud"] = function() {
-				displayDlg("printTagCloud");
+				displayDlg(__("Tag cloud"), "printTagCloud");
 		};
 		hotkey_actions["goto_prefs"] = function() {
 				gotoPreferences();
@@ -477,7 +480,25 @@ function init() {
 				new Ajax.Request("backend.php",	{
 					parameters: query,
 					onComplete: function(transport) {
-						window.location.reload();
+						setInitParam("combined_display_mode",
+								!getInitParam("combined_display_mode"));
+
+						closeArticlePanel();
+						viewCurrentFeed();
+
+								} });
+		};
+		hotkey_actions["toggle_cdm_expanded"] = function() {
+				notify_progress("Loading, please wait...");
+
+				var value = getInitParam("cdm_expanded") ? "false" : "true";
+				var query = "?op=rpc&method=setpref&key=CDM_EXPANDED&value=" + value;
+
+				new Ajax.Request("backend.php",	{
+					parameters: query,
+					onComplete: function(transport) {
+						setInitParam("cdm_expanded", !getInitParam("cdm_expanded"));
+						viewCurrentFeed();
 					} });
 		};
 
@@ -560,10 +581,10 @@ function quickMenuGo(opid) {
 			gotoLogout();
 			break;
 		case "qmcTagCloud":
-			displayDlg("printTagCloud");
+			displayDlg(__("Tag cloud"), "printTagCloud");
 			break;
 		case "qmcTagSelect":
-			displayDlg("printTagSelect");
+			displayDlg(__("Select item(s) by tags"), "printTagSelect");
 			break;
 		case "qmcSearch":
 			search();
@@ -731,10 +752,6 @@ function viewModeChanged() {
 	return viewCurrentFeed('');
 }
 
-function viewLimitChanged() {
-	return viewCurrentFeed('');
-}
-
 function rescoreCurrentFeed() {
 
 	var actid = getActiveFeedId();
@@ -851,13 +868,27 @@ function inPreferences() {
 function reverseHeadlineOrder() {
 	try {
 
-		var query_str = "?op=rpc&method=togglepref&key=REVERSE_HEADLINES";
+		/* var query_str = "?op=rpc&method=togglepref&key=REVERSE_HEADLINES";
 
 		new Ajax.Request("backend.php", {
 			parameters: query_str,
 			onComplete: function(transport) {
 					viewCurrentFeed();
-				} });
+				} }); */
+
+		var toolbar = document.forms["main_toolbar_form"];
+		var order_by = dijit.getEnclosingWidget(toolbar.order_by);
+
+		var value = order_by.attr('value');
+
+		if (value == "date_reverse")
+			value = "default";
+		else
+			value = "date_reverse";
+
+		order_by.attr('value', value);
+
+		viewCurrentFeed();
 
 	} catch (e) {
 		exception_error("reverseHeadlineOrder", e);

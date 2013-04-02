@@ -47,6 +47,9 @@ class API extends Handler {
 	}
 
 	function login() {
+		@session_destroy();
+		@session_start();
+
 		$login = db_escape_string($this->link, $_REQUEST["user"]);
 		$password = $_REQUEST["password"];
 		$password_base64 = base64_decode($_REQUEST["password"]);
@@ -122,6 +125,7 @@ class API extends Handler {
 	function getCategories() {
 		$unread_only = sql_bool_to_bool($_REQUEST["unread_only"]);
 		$enable_nested = sql_bool_to_bool($_REQUEST["enable_nested"]);
+		$include_empty = sql_bool_to_bool($_REQUEST['include_empty']);
 
 		// TODO do not return empty categories, return Uncategorized and standard virtual cats
 
@@ -144,7 +148,7 @@ class API extends Handler {
 		$cats = array();
 
 		while ($line = db_fetch_assoc($result)) {
-			if ($line["num_feeds"] > 0 || $line["num_cats"] > 0) {
+			if ($include_empty || $line["num_feeds"] > 0 || $line["num_cats"] > 0) {
 				$unread = getFeedUnread($this->link, $line["id"], true);
 
 				if ($enable_nested)
@@ -161,12 +165,14 @@ class API extends Handler {
 		}
 
 		foreach (array(-2,-1,0) as $cat_id) {
-			$unread = getFeedUnread($this->link, $cat_id, true);
+			if ($include_empty || !$this->isCategoryEmpty($cat_id)) {
+				$unread = getFeedUnread($this->link, $cat_id, true);
 
-			if ($unread || !$unread_only) {
-				array_push($cats, array("id" => $cat_id,
-					"title" => getCategoryTitle($this->link, $cat_id),
-					"unread" => $unread));
+				if ($unread || !$unread_only) {
+					array_push($cats, array("id" => $cat_id,
+						"title" => getCategoryTitle($this->link, $cat_id),
+						"unread" => $unread));
+				}
 			}
 		}
 
@@ -193,13 +199,23 @@ class API extends Handler {
 			$include_nested = sql_bool_to_bool($_REQUEST["include_nested"]);
 			$sanitize_content = true;
 
+			$override_order = false;
+			switch ($_REQUEST["order_by"]) {
+				case "date_reverse":
+					$override_order = "date_entered, updated";
+					break;
+				case "feed_dates":
+					$override_order = "updated DESC";
+					break;
+			}
+
 			/* do not rely on params below */
 
 			$search = db_escape_string($this->link, $_REQUEST["search"]);
 			$search_mode = db_escape_string($this->link, $_REQUEST["search_mode"]);
 
 			$headlines = $this->api_get_headlines($this->link, $feed_id, $limit, $offset,
-				$filter, $is_cat, $show_excerpt, $show_content, $view_mode, false,
+				$filter, $is_cat, $show_excerpt, $show_content, $view_mode, $override_order,
 				$include_attachments, $since_id, $search, $search_mode,
 				$include_nested, $sanitize_content);
 
@@ -323,6 +339,12 @@ class API extends Handler {
 					"feed_id" => $line["feed_id"],
 					"attachments" => $attachments
 				);
+
+				global $pluginhost;
+				foreach ($pluginhost->get_hooks($pluginhost::HOOK_RENDER_ARTICLE_API) as $p) {
+					$article = $p->hook_render_article_api(array("article" => $article));
+				}
+
 
 				array_push($articles, $article);
 
@@ -660,9 +682,11 @@ class API extends Handler {
 
 				$headline_row["always_display_attachments"] = sql_bool_to_bool($line["always_display_enclosures"]);
 
+				$headline_row["author"] = $line["author"];
+
 				global $pluginhost;
 				foreach ($pluginhost->get_hooks($pluginhost::HOOK_RENDER_ARTICLE_API) as $p) {
-					$headline_row = $p->hook_render_article_api($headline_row);
+					$headline_row = $p->hook_render_article_api(array("headline" => $headline_row));
 				}
 
 				array_push($headlines, $headline_row);
@@ -700,6 +724,45 @@ class API extends Handler {
 			print $this->wrap(self::STATUS_ERR, array("error" => 'INCORRECT_USAGE'));
 		}
 	}
+
+	function getFeedTree() {
+		$include_empty = sql_bool_to_bool($_REQUEST['include_empty']);
+
+		$pf = new Pref_Feeds($this->link, $_REQUEST);
+
+		$_REQUEST['mode'] = 2;
+		$_REQUEST['force_show_empty'] = $include_empty;
+
+		if ($pf){
+			$data = $pf->makefeedtree();
+			print $this->wrap(self::STATUS_OK, array("categories" => $data));
+		} else {
+			print $this->wrap(self::STATUS_ERR, array("error" =>
+				'UNABLE_TO_INSTANTIATE_OBJECT'));
+		}
+
+	}
+
+	// only works for labels or uncategorized for the time being
+	private function isCategoryEmpty($id) {
+
+		if ($id == -2) {
+			$result = db_query($this->link, "SELECT COUNT(*) AS count FROM ttrss_labels2
+				WHERE owner_uid = " . $_SESSION["uid"]);
+
+			return db_fetch_result($result, 0, "count") == 0;
+
+		} else if ($id == 0) {
+			$result = db_query($this->link, "SELECT COUNT(*) AS count FROM ttrss_feeds
+				WHERE cat_id IS NULL AND owner_uid = " . $_SESSION["uid"]);
+
+			return db_fetch_result($result, 0, "count") == 0;
+
+		}
+
+		return false;
+	}
+
 
 }
 
