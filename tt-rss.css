@@ -194,7 +194,6 @@ a:hover {
 
 .even.Unread.Selected, .even.Unread.Selected td {
 	/* background : #fff7d5 ! important; */
-	font-weight : bold;
 	border-width : 0px 0px 1px 0px;
 	border-style : solid;
 	border-color : #4E72D5;
@@ -202,7 +201,6 @@ a:hover {
 
 .odd.Unread.Selected, .odd.Unread.Selected td {
 	/* background : #fff7d5 ! important; */
-	font-weight : bold;
 	border-width : 0px 0px 1px 0px;
 	border-style : solid;
 	border-color : #4E72D5;
@@ -254,7 +252,6 @@ a:hover {
 
 .even.Unread, .even.Unread td {
 	/* background : #f0f0f0; */
-	font-weight : bold;
 	border-width : 0px 0px 1px 0px;
 	border-style : solid;
 	border-color : #c0c0c0;
@@ -262,7 +259,6 @@ a:hover {
 }
 
 .odd.Unread, .odd.Unread td {
-	font-weight : bold;
 	border-width : 0px 0px 1px 0px;
 	border-style : solid;
 	border-color : #c0c0c0;
@@ -1001,14 +997,17 @@ div.hlTitle {
 	cursor : pointer;
 	width : 100%;
 	vertical-align : middle;
-	padding-top : 4px;
-	padding-bottom : 4px;
+	padding: 4px;
+	font-size:90%;
 }
 
 div.hlLeft {
+	/*
 	display : table-cell;
 	vertical-align : middle;
 	white-space: nowrap;
+	*/
+	display:none !important;
 }
 
 div.hlRight {
@@ -1032,6 +1031,9 @@ span.hlUpdated {
 	padding-top : 4px;
 	padding-bottom : 4px;
 	text-align : right;
+	font-size:80%;
+	color:#aaa!important;
+	font-weight:normal!important;
 }
 
 div.hlLeft {
@@ -1334,6 +1336,7 @@ ul.helpKbList h2 {
 	padding-top:7px;
 	font-size:90%;
 	background:#fff;
+	margin-left:1px;
 }
 .cdmContentInner {
 	width:650px;
@@ -1350,7 +1353,7 @@ ul.helpKbList h2 {
 	border-size:1px!important;
 }
 .cdmHeader {
-	margin: 0px 10px -6px 0px;
+	margin: 1px 10px -6px 1px;
 	max-width:650px;
 	background-color:#fff!important;
 	padding-left:5px;
@@ -1517,6 +1520,16 @@ strong, b {
 }
 @media screen and (max-width: 1024px) { 
 	.cdmHeader {
-		max-width:430px;
+		max-width:480px;
+	}
+}
+@media screen and (max-width: 964px) { 
+	.cdmHeader {
+		max-width:410px;
+	}
+}
+@media screen and (max-width: 871px) { 
+	.meta {
+		display:none;
 	}
 }
