@@ -318,7 +318,7 @@
 		global $fetch_last_error;
 		global $fetch_last_error_code;
 
-		if (function_exists('curl_init') && !ini_get("open_basedir")) {
+		if (!defined('NO_CURL') && function_exists('curl_init') && !ini_get("open_basedir")) {
 
 			if (ini_get("safe_mode")) {
 				$ch = curl_init(geturl($url));
@@ -396,9 +396,6 @@
 			}
 
 			$data = @file_get_contents($url);
-
-			@$gzdecoded = gzdecode($data);
-			if ($gzdecoded) $data = $gzdecoded;
 
 			if (!$data && function_exists('error_get_last')) {
 				$error = error_get_last();
@@ -633,6 +630,7 @@
 				@session_start();
 
 				$_SESSION["uid"] = $user_id;
+				$_SESSION["version"] = VERSION;
 
 				$result = db_query($link, "SELECT login,access_level,pwd_hash FROM ttrss_users
 					WHERE id = '$user_id'");
@@ -747,7 +745,9 @@
 			cache_prefs($link);
 			load_user_plugins($link, $_SESSION["uid"]);
 		} else {
-			if (!$_SESSION["uid"] || !validate_session($link)) {
+			if (!validate_session($link)) $_SESSION["uid"] = false;
+
+			if (!$_SESSION["uid"]) {
 
 				if (AUTH_AUTO_LOGIN && authenticate_user($link, null, null)) {
 				    $_SESSION["ref_schema_version"] = get_schema_version($link, true);
@@ -755,7 +755,13 @@
 					 authenticate_user($link, null, null, true);
 				}
 
-				if (!$_SESSION["uid"]) render_login_form($link);
+				if (!$_SESSION["uid"]) {
+					@session_destroy();
+					setcookie(session_name(), '', time()-42000, '/');
+
+					render_login_form($link);
+					exit;
+				}
 
 			} else {
 				/* bump login timestamp */
@@ -1076,9 +1082,9 @@
 						$intl = get_pref($link, "FRESH_ARTICLE_MAX_AGE");
 
 						if (DB_TYPE == "pgsql") {
-							$match_part = "updated > NOW() - INTERVAL '$intl hour' ";
+							$match_part = "date_entered > NOW() - INTERVAL '$intl hour' ";
 						} else {
-							$match_part = "updated > DATE_SUB(NOW(),
+							$match_part = "date_entered > DATE_SUB(NOW(),
 								INTERVAL $intl HOUR) ";
 						}
 
@@ -1086,7 +1092,7 @@
 							SET unread = false, last_read = NOW() WHERE ref_id IN
 								(SELECT id FROM
 									(SELECT id FROM ttrss_entries, ttrss_user_entries WHERE ref_id = id
-										AND owner_uid = $owner_uid AND unread = true AND feed_id = $feed AND $date_qpart AND $match_part) as tmp)");
+										AND owner_uid = $owner_uid AND unread = true AND $date_qpart AND $match_part) as tmp)");
 					}
 
 					if ($feed == -4) {
@@ -2126,39 +2132,62 @@
 
 			$commandpair = explode(":", mb_strtolower($k), 2);
 
-			if ($commandpair[0] == "note" && $commandpair[1]) {
+			switch ($commandpair[0]) {
+			case "title":
+				if ($commandpair[1]) {
+					array_push($query_keywords, "($not (LOWER(ttrss_entries.title) LIKE '%".
+						db_escape_string($link, mb_strtolower($commandpair[1]))."%'))");
+				}
+				break;
+			case "author":
+				if ($commandpair[1]) {
+					array_push($query_keywords, "($not (LOWER(author) LIKE '%".
+						db_escape_string($link, mb_strtolower($commandpair[1]))."%'))");
+				}
+				break;
+			case "note":
+				if ($commandpair[1]) {
+					if ($commandpair[1] == "true")
+						array_push($query_keywords, "($not (note IS NOT NULL AND note != ''))");
+					else if ($commandpair[1] == "false")
+						array_push($query_keywords, "($not (note IS NULL OR note = ''))");
+					else
+						array_push($query_keywords, "($not (LOWER(note) LIKE '%".
+							db_escape_string($link, mb_strtolower($commandpair[1]))."%'))");
+				}
+				break;
+			case "star":
 
-				if ($commandpair[1] == "true")
-					array_push($query_keywords, "($not (note IS NOT NULL AND note != ''))");
-				else
-					array_push($query_keywords, "($not (note IS NULL OR note = ''))");
+				if ($commandpair[1]) {
+					if ($commandpair[1] == "true")
+						array_push($query_keywords, "($not (marked = true))");
+					else
+						array_push($query_keywords, "($not (marked = false))");
+				}
+				break;
+			case "pub":
+				if ($commandpair[1]) {
+					if ($commandpair[1] == "true")
+						array_push($query_keywords, "($not (published = true))");
+					else
+						array_push($query_keywords, "($not (published = false))");
 
-			} else if ($commandpair[0] == "star" && $commandpair[1]) {
+				}
+				break;
+			default:
+				if (strpos($k, "@") === 0) {
 
-				if ($commandpair[1] == "true")
-					array_push($query_keywords, "($not (marked = true))");
-				else
-					array_push($query_keywords, "($not (marked = false))");
+					$user_tz_string = get_pref($link, 'USER_TIMEZONE', $_SESSION['uid']);
+					$orig_ts = strtotime(substr($k, 1));
+					$k = date("Y-m-d", convert_timestamp($orig_ts, $user_tz_string, 'UTC'));
 
-			} else if ($commandpair[0] == "pub" && $commandpair[1]) {
+					//$k = date("Y-m-d", strtotime(substr($k, 1)));
 
-				if ($commandpair[1] == "true")
-					array_push($query_keywords, "($not (published = true))");
-				else
-					array_push($query_keywords, "($not (published = false))");
-
-			} else if (strpos($k, "@") === 0) {
-
-				$user_tz_string = get_pref($link, 'USER_TIMEZONE', $_SESSION['uid']);
-				$orig_ts = strtotime(substr($k, 1));
-				$k = date("Y-m-d", convert_timestamp($orig_ts, $user_tz_string, 'UTC'));
-
-				//$k = date("Y-m-d", strtotime(substr($k, 1)));
-
-				array_push($query_keywords, "(".SUBSTRING_FOR_DATE."(updated,1,LENGTH('$k')) $not = '$k')");
-			} else {
-				array_push($query_keywords, "(UPPER(ttrss_entries.title) $not LIKE UPPER('%$k%')
-						OR UPPER(ttrss_entries.content) $not LIKE UPPER('%$k%'))");
+					array_push($query_keywords, "(".SUBSTRING_FOR_DATE."(updated,1,LENGTH('$k')) $not = '$k')");
+				} else {
+					array_push($query_keywords, "(UPPER(ttrss_entries.title) $not LIKE UPPER('%$k%')
+							OR UPPER(ttrss_entries.content) $not LIKE UPPER('%$k%'))");
+				}
 			}
 		}
 
@@ -2408,6 +2437,7 @@
 
 				$vfeed_query_part = "ttrss_feeds.title AS feed_title,";
 			} else if ($feed == -4) { // all articles virtual feed
+				$allow_archived = true;
 				$query_strategy_part = "true";
 				$vfeed_query_part = "ttrss_feeds.title AS feed_title,";
 			} else if ($feed <= LABEL_BASE_INDEX) { // labels
@@ -2425,13 +2455,7 @@
 				$query_strategy_part = "true";
 			}
 
-			if (get_pref($link, "SORT_HEADLINES_BY_FEED_DATE", $owner_uid)) {
-				$date_sort_field = "updated";
-			} else {
-				$date_sort_field = "date_entered";
-			}
-
-			$order_by = "$date_sort_field DESC, updated DESC";
+			$order_by = "score DESC, date_entered DESC, updated DESC";
 
 			if ($view_mode == "unread_first") {
 				$order_by = "unread DESC, $order_by";
@@ -2676,14 +2700,16 @@
 
 		}
 
-		$allowed_elements = array('a', 'address', 'audio', 'article',
-			'b', 'big', 'blockquote', 'body', 'br', 'cite', 'center',
-			'code', 'dd', 'del', 'details', 'div', 'dl', 'font',
-			'dt', 'em', 'footer', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6',
-			'header', 'html', 'i', 'img', 'ins', 'kbd',
-			'li', 'nav', 'noscript', 'ol', 'p', 'pre', 'q', 's','small',
+		$allowed_elements = array('a', 'address', 'audio', 'article', 'aside',
+			'b', 'bdi', 'bdo', 'big', 'blockquote', 'body', 'br',
+			'caption', 'cite', 'center', 'code', 'col', 'colgroup',
+			'data', 'dd', 'del', 'details', 'div', 'dl', 'font',
+			'dt', 'em', 'footer', 'figure', 'figcaption',
+			'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'header', 'html', 'i',
+			'img', 'ins', 'kbd', 'li', 'main', 'mark', 'nav', 'noscript',
+			'ol', 'p', 'pre', 'q', 'ruby', 'rp', 'rt', 's', 'samp', 'small',
 			'source', 'span', 'strike', 'strong', 'sub', 'summary',
-			'sup', 'table', 'tbody', 'td', 'tfoot', 'th', 'thead',
+			'sup', 'table', 'tbody', 'td', 'tfoot', 'th', 'thead', 'time',
 			'tr', 'track', 'tt', 'u', 'ul', 'var', 'wbr', 'video' );
 
 		if ($_SESSION['hasSandbox']) $allowed_elements[] = 'iframe';

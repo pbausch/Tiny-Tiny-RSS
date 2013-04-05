@@ -132,6 +132,8 @@ function viewfeed(feed, method, is_cat, offset, background, infscroll_req) {
 
 		console.log(query);
 
+		setActiveFeedId(feed, is_cat);
+
 		new Ajax.Request("backend.php", {
 			parameters: query,
 			onComplete: function(transport) {
@@ -380,20 +382,8 @@ function getNextUnreadFeed(feed, is_cat) {
 	}
 }
 
-function catchupCurrentFeed(elem) {
-
-	if (elem) {
-		var toolbar = document.forms["main_toolbar_form"];
-		var catchup_feed = dijit.getEnclosingWidget(toolbar.catchup_feed);
-		var mode = catchup_feed.attr('value');
-
-		if (mode != 'default') {
-			catchupFeed(getActiveFeedId(), activeFeedIsCat(), mode);
-			catchup_feed.attr('value', 'default');
-		}
-	} else {
-		catchupFeed(getActiveFeedId(), activeFeedIsCat());
-	}
+function catchupCurrentFeed(mode) {
+	catchupFeed(getActiveFeedId(), activeFeedIsCat(), mode);
 }
 
 function catchupFeedInGroup(id) {
