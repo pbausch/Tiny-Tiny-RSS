@@ -1499,7 +1499,7 @@ strong, b {
 }
 
 
-#dijit_form_Select_0, #dijit_form_Select_1 {display:none;}
+#dijit_form_Select_0, #dijit_form_Select_1, .attachments {display:none;}
 
 
 #feed_title, #feed_title a {
