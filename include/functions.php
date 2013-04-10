@@ -1,12 +1,13 @@
 <?php
 	define('EXPECTED_CONFIG_VERSION', 26);
-	define('SCHEMA_VERSION', 115);
+	define('SCHEMA_VERSION', 116);
 
 	define('LABEL_BASE_INDEX', -1024);
 	define('PLUGIN_FEED_BASE_INDEX', -128);
 
 	$fetch_last_error = false;
 	$fetch_last_error_code = false;
+	$fetch_last_content_type = false;
 	$pluginhost = false;
 
 	function __autoload($class) {
@@ -317,6 +318,9 @@
 
 		global $fetch_last_error;
 		global $fetch_last_error_code;
+		global $fetch_last_content_type;
+
+		$url = str_replace(' ', '%20', $url);
 
 		if (!defined('NO_CURL') && function_exists('curl_init') && !ini_get("open_basedir")) {
 
@@ -365,11 +369,11 @@
 			}
 
 			$http_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-			$content_type = curl_getinfo($ch, CURLINFO_CONTENT_TYPE);
+			$fetch_last_content_type = curl_getinfo($ch, CURLINFO_CONTENT_TYPE);
 
 			$fetch_last_error_code = $http_code;
 
-			if ($http_code != 200 || $type && strpos($content_type, "$type") === false) {
+			if ($http_code != 200 || $type && strpos($fetch_last_content_type, "$type") === false) {
 				if (curl_errno($ch) != 0) {
 					$fetch_last_error = curl_errno($ch) . " " . curl_error($ch);
 				} else {
@@ -396,6 +400,15 @@
 			}
 
 			$data = @file_get_contents($url);
+
+			$fetch_last_content_type = false;  // reset if no type was sent from server
+			foreach ($http_response_header as $h) {
+				if (substr(strtolower($h), 0, 13) == 'content-type:') {
+					$fetch_last_content_type = substr($h, 14);
+					// don't abort here b/c there might be more than one
+					// e.g. if we were being redirected -- last one is the right one
+				}
+			}
 
 			if (!$data && function_exists('error_get_last')) {
 				$error = error_get_last();
@@ -1467,7 +1480,8 @@
 		$result = db_query($link, "SELECT id,caption,COUNT(unread) AS unread
 			FROM ttrss_labels2 LEFT JOIN ttrss_user_labels2 ON
 				(ttrss_labels2.id = label_id)
-					LEFT JOIN ttrss_user_entries ON (ref_id = article_id AND unread = true)
+				LEFT JOIN ttrss_user_entries ON (ref_id = article_id AND unread = true
+					AND ttrss_user_entries.owner_uid = $owner_uid)
 				WHERE ttrss_labels2.owner_uid = $owner_uid GROUP BY ttrss_labels2.id,
 					ttrss_labels2.caption");
 
@@ -1912,6 +1926,8 @@
 				"prev_article" => __("Open previous article"),
 				"next_article_noscroll" => __("Open next article (don't scroll long articles)"),
 				"prev_article_noscroll" => __("Open previous article (don't scroll long articles)"),
+				"next_article_noexpand" => __("Move to next article (don't expand or mark read)"),
+				"prev_article_noexpand" => __("Move to previous article (don't expand or mark read)"),
 				"search_dialog" => __("Show search dialog")),
 			__("Article") => array(
 				"toggle_mark" => __("Toggle starred"),
@@ -1928,6 +1944,7 @@
 				"select_article_cursor" => __("Select article under cursor"),
 				"email_article" => __("Email article"),
 				"close_article" => __("Close/collapse article"),
+				"toggle_expand" => __("Toggle article expansion (combined mode)"),
 				"toggle_widescreen" => __("Toggle widescreen mode"),
 				"toggle_embed_original" => __("Toggle embed original")),
 			__("Article selection") => array(
@@ -2137,12 +2154,18 @@
 				if ($commandpair[1]) {
 					array_push($query_keywords, "($not (LOWER(ttrss_entries.title) LIKE '%".
 						db_escape_string($link, mb_strtolower($commandpair[1]))."%'))");
+				} else {
+					array_push($query_keywords, "(UPPER(ttrss_entries.title) $not LIKE UPPER('%$k%')
+							OR UPPER(ttrss_entries.content) $not LIKE UPPER('%$k%'))");
 				}
 				break;
 			case "author":
 				if ($commandpair[1]) {
 					array_push($query_keywords, "($not (LOWER(author) LIKE '%".
 						db_escape_string($link, mb_strtolower($commandpair[1]))."%'))");
+				} else {
+					array_push($query_keywords, "(UPPER(ttrss_entries.title) $not LIKE UPPER('%$k%')
+							OR UPPER(ttrss_entries.content) $not LIKE UPPER('%$k%'))");
 				}
 				break;
 			case "note":
@@ -2154,6 +2177,9 @@
 					else
 						array_push($query_keywords, "($not (LOWER(note) LIKE '%".
 							db_escape_string($link, mb_strtolower($commandpair[1]))."%'))");
+				} else {
+					array_push($query_keywords, "(UPPER(ttrss_entries.title) $not LIKE UPPER('%$k%')
+							OR UPPER(ttrss_entries.content) $not LIKE UPPER('%$k%'))");
 				}
 				break;
 			case "star":
@@ -2163,6 +2189,9 @@
 						array_push($query_keywords, "($not (marked = true))");
 					else
 						array_push($query_keywords, "($not (marked = false))");
+				} else {
+					array_push($query_keywords, "(UPPER(ttrss_entries.title) $not LIKE UPPER('%$k%')
+							OR UPPER(ttrss_entries.content) $not LIKE UPPER('%$k%'))");
 				}
 				break;
 			case "pub":
@@ -2172,6 +2201,9 @@
 					else
 						array_push($query_keywords, "($not (published = false))");
 
+				} else {
+					array_push($query_keywords, "(UPPER(ttrss_entries.title) $not LIKE UPPER('%$k%')
+							OR UPPER(ttrss_entries.content) $not LIKE UPPER('%$k%'))");
 				}
 				break;
 			default:
@@ -2707,8 +2739,8 @@
 			'dt', 'em', 'footer', 'figure', 'figcaption',
 			'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'header', 'html', 'i',
 			'img', 'ins', 'kbd', 'li', 'main', 'mark', 'nav', 'noscript',
-			'ol', 'p', 'pre', 'q', 'ruby', 'rp', 'rt', 's', 'samp', 'small',
-			'source', 'span', 'strike', 'strong', 'sub', 'summary',
+			'ol', 'p', 'pre', 'q', 'ruby', 'rp', 'rt', 's', 'samp', 'section',
+			'small', 'source', 'span', 'strike', 'strong', 'sub', 'summary',
 			'sup', 'table', 'tbody', 'td', 'tfoot', 'th', 'thead', 'time',
 			'tr', 'track', 'tt', 'u', 'ul', 'var', 'wbr', 'video' );
 
@@ -3021,6 +3053,7 @@
 			".SUBSTRING_FOR_DATE."(updated,1,16) as updated,
 			(SELECT site_url FROM ttrss_feeds WHERE id = feed_id) as site_url,
 			(SELECT hide_images FROM ttrss_feeds WHERE id = feed_id) as hide_images,
+			(SELECT always_display_enclosures FROM ttrss_feeds WHERE id = feed_id) as always_display_enclosures,
 			num_comments,
 			tag_cache,
 			author,
@@ -3119,18 +3152,23 @@
 					position=\"below\">$tags_str_full</div>";
 
 				global $pluginhost;
-
 				foreach ($pluginhost->get_hooks($pluginhost::HOOK_ARTICLE_BUTTON) as $p) {
 					$rv['content'] .= $p->hook_article_button($line);
 				}
-
 
 			} else {
 				$tags_str = strip_tags($tags_str);
 				$rv['content'] .= "<span id=\"ATSTR-$id\">$tags_str</span>";
 			}
 			$rv['content'] .= "</div>";
-			$rv['content'] .= "<div clear='both'>$entry_comments</div>";
+			$rv['content'] .= "<div clear='both'>";
+
+			global $pluginhost;
+			foreach ($pluginhost->get_hooks($pluginhost::HOOK_ARTICLE_LEFT_BUTTON) as $p) {
+				$rv['content'] .= $p->hook_article_left_button($line);
+			}
+
+			$rv['content'] .= "$entry_comments</div>";
 
 			if ($line["orig_feed_id"]) {
 
@@ -3170,9 +3208,10 @@
 			$rv['content'] .= "<div class=\"postContent\">";
 
 			$rv['content'] .= $line["content"];
-
 			$rv['content'] .= format_article_enclosures($link, $id,
-				$always_display_enclosures, $line["content"], $line["hide_images"]);
+				sql_bool_to_bool($line["always_display_enclosures"]),
+				$line["content"],
+				sql_bool_to_bool($line["hide_images"]));
 
 			$rv['content'] .= "</div>";
 

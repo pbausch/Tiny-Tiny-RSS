@@ -160,16 +160,10 @@ function headlines_callback2(transport, offset, background, infscroll_req) {
 					initHeadlinesMenu();
 
 					new_elems.each(function(child) {
-						var cb = dijit.byId(child.id.replace("RROW-", "RCHK-"));
+						dojo.parser.parse(child);
 
-						if (!cb) {
-							dojo.parser.parse(child);
-
-							if (!Element.visible(child))
-								new Effect.Appear(child, { duration : 0.5 });
-						} else {
-							c.domNode.removeChild(child);
-						}
+						if (!Element.visible(child))
+							new Effect.Appear(child, { duration : 0.5 });
 					});
 
 				} else {
@@ -210,6 +204,16 @@ function headlines_callback2(transport, offset, background, infscroll_req) {
 
 		unpackVisibleHeadlines();
 
+		// if we have some more space in the buffer, why not try to fill it
+
+		if (!_infscroll_disable && $("headlines-spacer") &&
+				$("headlines-spacer").offsetTop < $("headlines-frame").offsetHeight) {
+
+			window.setTimeout(function() {
+				loadMoreHeadlines();
+			}, 250);
+		}
+
 		notify("");
 
 	} catch (e) {
@@ -241,7 +245,7 @@ function render_article(article) {
 	}
 }
 
-function showArticleInHeadlines(id) {
+function showArticleInHeadlines(id, noexpand) {
 
 	try {
 		selectArticles("none");
@@ -252,7 +256,8 @@ function showArticleInHeadlines(id) {
 
 		var article_is_unread = crow.hasClassName("Unread");
 
-		crow.removeClassName("Unread");
+		if (!noexpand)
+			crow.removeClassName("Unread");
 		crow.addClassName("active");
 
 		selectArticles('none');
@@ -268,7 +273,7 @@ function showArticleInHeadlines(id) {
 
 		markHeadline(id);
 
-		if (article_is_unread)
+		if (article_is_unread && !noexpand)
 			_force_scheduled_update = true;
 
 	} catch (e) {
@@ -336,7 +341,7 @@ function article_callback2(transport, id) {
 	}
 }
 
-function view(id) {
+function view(id, activefeed, noexpand) {
 	try {
 		var oldrow = $("RROW-" + getActiveArticleId());
 		if (oldrow) oldrow.removeClassName("active");
@@ -344,6 +349,11 @@ function view(id) {
 		var crow = $("RROW-" + id);
 
 		if (!crow) return;
+		if (noexpand) {
+			setActiveArticleId(id);
+			showArticleInHeadlines(id, noexpand);
+			return;
+		}
 
 		console.log("loading article: " + id);
 
@@ -432,20 +442,26 @@ function toggleMark(id, client_only) {
 	try {
 		var query = "?op=rpc&id=" + id + "&method=mark";
 
-		var img = $("FMPIC-" + id);
+		var row = $("RROW-" + id);
+		if (!row) return;
 
-		if (!img) return;
+		var imgs = row.getElementsByClassName("markedPic");
 
-		if (img.src.match("mark_unset")) {
-			img.src = img.src.replace("mark_unset", "mark_set");
-			img.alt = __("Unstar article");
-			query = query + "&mark=1";
+		for (i = 0; i < imgs.length; i++) {
+			var img = imgs[i];
 
-		} else {
-			img.src = img.src.replace("mark_set", "mark_unset");
-			img.alt = __("Star article");
-			query = query + "&mark=0";
+			if (!row.hasClassName("marked")) {
+				img.src = img.src.replace("mark_unset", "mark_set");
+				img.alt = __("Unstar article");
+				query = query + "&mark=1";
+			} else {
+				img.src = img.src.replace("mark_set", "mark_unset");
+				img.alt = __("Star article");
+				query = query + "&mark=0";
+			}
 		}
+
+		row.toggleClassName("marked");
 
 		if (!client_only) {
 			new Ajax.Request("backend.php", {
@@ -470,21 +486,29 @@ function togglePub(id, client_only, no_effects, note) {
 			query = query + "&note=undefined";
 		}
 
-		var img = $("FPPIC-" + id);
+		var row = $("RROW-" + id);
+		if (!row) return;
 
-		if (!img) return;
+		var imgs = row.getElementsByClassName("pubPic");
 
-		if (img.src.match("pub_unset") || note != undefined) {
-			img.src = img.src.replace("pub_unset", "pub_set");
-			img.alt = __("Unpublish article");
-			query = query + "&pub=1";
+		for (i = 0; i < imgs.length; i++) {
+			var img = imgs[i];
 
-		} else {
-			img.src = img.src.replace("pub_set", "pub_unset");
-			img.alt = __("Publish article");
-
-			query = query + "&pub=0";
+			if (!row.hasClassName("published") || note != undefined) {
+				img.src = img.src.replace("pub_unset", "pub_set");
+				img.alt = __("Unpublish article");
+				query = query + "&pub=1";
+			} else {
+				img.src = img.src.replace("pub_set", "pub_unset");
+				img.alt = __("Publish article");
+				query = query + "&pub=0";
+			}
 		}
+
+		if (note != undefined)
+			row.addClassName("published");
+		else
+			row.toggleClassName("published");
 
 		if (!client_only) {
 			new Ajax.Request("backend.php", {
@@ -499,7 +523,7 @@ function togglePub(id, client_only, no_effects, note) {
 	}
 }
 
-function moveToPost(mode, noscroll) {
+function moveToPost(mode, noscroll, noexpand) {
 
 	try {
 
@@ -546,13 +570,13 @@ function moveToPost(mode, noscroll) {
 						scrollArticle(ctr.offsetHeight/4);
 
 					} else if (next_id) {
-						cdmExpandArticle(next_id);
+						cdmExpandArticle(next_id, noexpand);
 						cdmScrollToArticleId(next_id, true);
 					}
 
 				} else if (next_id) {
 					correctHeadlinesOffset(next_id);
-					view(next_id, getActiveFeedId());
+					view(next_id, getActiveFeedId(), noexpand);
 				}
 			}
 		}
@@ -570,7 +594,7 @@ function moveToPost(mode, noscroll) {
 						if (!noscroll && article.offsetTop < ctr.scrollTop) {
 							scrollArticle(-ctr.offsetHeight/4);
 						} else {
-							cdmExpandArticle(prev_id);
+							cdmExpandArticle(prev_id, noexpand);
 							cdmScrollToArticleId(prev_id, true);
 						}
 					} else {
@@ -579,17 +603,17 @@ function moveToPost(mode, noscroll) {
 							scrollArticle(-ctr.offsetHeight/3);
 						} else if (!noscroll && prev_article &&
 								prev_article.offsetTop < ctr.scrollTop) {
-							cdmExpandArticle(prev_id);
+							cdmExpandArticle(prev_id, noexpand);
 							scrollArticle(-ctr.offsetHeight/4);
 						} else if (prev_id) {
-							cdmExpandArticle(prev_id);
+							cdmExpandArticle(prev_id, noexpand);
 							cdmScrollToArticleId(prev_id, noscroll);
 						}
 					}
 
 				} else if (prev_id) {
 					correctHeadlinesOffset(prev_id);
-					view(prev_id, getActiveFeedId());
+					view(prev_id, getActiveFeedId(), noexpand);
 				}
 			}
 		}
@@ -601,11 +625,12 @@ function moveToPost(mode, noscroll) {
 
 function toggleSelected(id, force_on) {
 	try {
-
-		var cb = dijit.byId("RCHK-" + id);
 		var row = $("RROW-" + id);
 
 		if (row) {
+			var cb = dijit.getEnclosingWidget(
+					row.getElementsByClassName("rchk")[0]);
+
 			if (row.hasClassName('Selected') && !force_on) {
 				row.removeClassName('Selected');
 				if (cb) cb.attr("checked", false);
@@ -888,7 +913,9 @@ function selectArticles(mode) {
 
 		children.each(function(child) {
 			var id = child.id.replace("RROW-", "");
-			var cb = dijit.byId("RCHK-" + id);
+
+			var cb = dijit.getEnclosingWidget(
+					child.getElementsByClassName("rchk")[0]);
 
 			if (mode == "all") {
 				child.addClassName("Selected");
@@ -902,9 +929,7 @@ function selectArticles(mode) {
 					if (cb) cb.attr("checked", false);
 				}
 			} else if (mode == "marked") {
-				var img = $("FMPIC-" + child.id.replace("RROW-", ""));
-
-				if (img && img.src.match("mark_set")) {
+				if (child.hasClassName("marked")) {
 					child.addClassName("Selected");
 					if (cb) cb.attr("checked", true);
 				} else {
@@ -912,9 +937,7 @@ function selectArticles(mode) {
 					if (cb) cb.attr("checked", false);
 				}
 			} else if (mode == "published") {
-				var img = $("FPPIC-" + child.id.replace("RROW-", ""));
-
-				if (img && img.src.match("pub_set")) {
+				if (child.hasClassName("published")) {
 					child.addClassName("Selected");
 					if (cb) cb.attr("checked", true);
 				} else {
@@ -1375,7 +1398,28 @@ function cdmCollapseArticle(event, id) {
 	}
 }
 
-function cdmExpandArticle(id) {
+function cdmUnexpandArticle(event, id) {
+	try {
+		var row = $("RROW-" + id);
+		var elem = $("CICD-" + id);
+
+		if (elem && row) {
+			var collapse = $$("div#RROW-" + id +
+				" span[class='collapseBtn']")[0];
+
+		  	Element.hide(elem);
+			Element.show("CEXC-" + id);
+			Element.hide(collapse);
+
+			if (event) Event.stop(event);
+		}
+
+	} catch (e) {
+		exception_error("cdmUnexpandArticle", e);
+	}
+}
+
+function cdmExpandArticle(id, noexpand) {
 	try {
 		console.log("cdmExpandArticle " + id);
 
@@ -1412,7 +1456,7 @@ function cdmExpandArticle(id) {
 
 		var cencw = $("CENCW-" + id);
 
-		if (!Element.visible(elem)) {
+		if (!Element.visible(elem) && !noexpand) {
 			if (cencw) {
 				cencw.innerHTML = htmlspecialchars_decode(cencw.innerHTML);
 				cencw.setAttribute('id', '');
@@ -1429,7 +1473,8 @@ function cdmExpandArticle(id) {
 		if (old_offset > new_offset)
 			$("headlines-frame").scrollTop -= (old_offset-new_offset);
 
-		toggleUnread(id, 0, true);
+		if (!noexpand)
+			toggleUnread(id, 0, true);
 		toggleSelected(id);
 		$("RROW-" + id).addClassName("active");
 
@@ -1701,7 +1746,8 @@ function markHeadline(id, marked) {
 
 	var row = $("RROW-" + id);
 	if (row) {
-		var check = dijit.byId("RCHK-" + id);
+		var check = dijit.getEnclosingWidget(
+				row.getElementsByClassName("rchk")[0]);
 
 		if (check) {
 			check.attr("checked", marked);
