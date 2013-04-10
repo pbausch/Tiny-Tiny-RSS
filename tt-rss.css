@@ -429,6 +429,8 @@ a.helpLink:hover {
 	border-style : solid;
 	background : #fafafa;
 	display : block;
+	max-width : 98%;
+	overflow : auto;
 }
 
 div.notice {
@@ -613,7 +615,7 @@ span.hlFeed a:hover {
 	color : #4684ff;
 }
 
-img.markedPic {
+img.markedPic, img.pubPic {
 	cursor : pointer;
 	vertical-align : middle;
 }
@@ -1101,6 +1103,10 @@ div.fatalError textarea {
 	padding : 0px;
 	margin : 0px;
 	border-width : 0px;
+}
+
+#feedTree {
+	overflow : visible;
 }
 
 #headlines-frame {
