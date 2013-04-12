@@ -1539,3 +1539,39 @@ strong, b {
 		display:none;
 	}
 }
+
+.claro .dijitTreeRowSelected {
+	background-color: #5ab9ee;
+	background: #5ab9ee; /* Old browsers */
+	background: -moz-linear-gradient(top,  #5ab9ee 0%, #3097de 51%, #0f76c7 100%); /* FF3.6+ */
+	background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#5ab9ee), color-stop(51%,#3097de), color-stop(100%,#0f76c7)); /* Chrome,Safari4+ */
+	background: -webkit-linear-gradient(top,  #5ab9ee 0%,#3097de 51%,#0f76c7 100%); /* Chrome10+,Safari5.1+ */
+	background: -o-linear-gradient(top,  #5ab9ee 0%,#3097de 51%,#0f76c7 100%); /* Opera 11.10+ */
+	background: -ms-linear-gradient(top,  #5ab9ee 0%,#3097de 51%,#0f76c7 100%); /* IE10+ */
+	background: linear-gradient(to bottom,  #5ab9ee 0%,#3097de 51%,#0f76c7 100%); /* W3C */
+	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#5ab9ee', endColorstr='#0f76c7',GradientType=0 ); /* IE6-9 */
+	margin: 0;
+	border: solid 1px #197CC9;
+	color: #FFF;
+	text-shadow: 0 1px rgba(100,100,100,.8);
+	outline:none !important;
+}
+.claro .dijitTreeRowHover {
+	background-color: #0E86D9;
+	background-image: url("images/commonHighlight.png");
+	margin: 0;
+	border: solid 1px #197CC9;
+	color: #FFF;
+	outline:none !important;
+}
+.claro .dijitTreeRow, .claro .dijitTreeNode .dojoDndItemBefore, .claro .dijitTreeNode .dojoDndItemAfter {
+  -webkit-transition-property: background-color, border-color;
+  -moz-transition-property: background-color, border-color;
+  transition-property: background-color, border-color;
+  -webkit-transition-duration: 0s;
+  -moz-transition-duration: 0s;
+  transition-duration: 0s;
+  -webkit-transition-timing-function: ease-out;
+  -moz-transition-timing-function: ease-out;
+  transition-timing-function: ease-out;
+}
