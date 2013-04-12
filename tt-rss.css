@@ -1539,7 +1539,7 @@ strong, b {
 	}
 }
 
-.claro .dijitTreeRowSelected {
+.claro .dijitTreeRowSelected, .claro .dijitTreeRowHover {
 	background-color: #5ab9ee;
 	background: #5ab9ee; /* Old browsers */
 	background: -moz-linear-gradient(top,  #5ab9ee 0%, #3097de 51%, #0f76c7 100%); /* FF3.6+ */
@@ -1553,14 +1553,6 @@ strong, b {
 	border: solid 1px #197CC9;
 	color: #FFF;
 	text-shadow: 0 1px rgba(100,100,100,.8);
-	outline:none !important;
-}
-.claro .dijitTreeRowHover {
-	background-color: #0E86D9;
-	background-image: url("images/commonHighlight.png");
-	margin: 0;
-	border: solid 1px #197CC9;
-	color: #FFF;
 	outline:none !important;
 }
 .claro .dijitTreeRow, .claro .dijitTreeNode .dojoDndItemBefore, .claro .dijitTreeNode .dojoDndItemAfter {
